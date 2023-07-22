@@ -1,0 +1,5 @@
+variables:
+  - name: devAgentPool
+    value: "azure-ubuntu-vm"
+  - name: prodAgentPool
+    value: "azure-ubuntu-vm-prod"
