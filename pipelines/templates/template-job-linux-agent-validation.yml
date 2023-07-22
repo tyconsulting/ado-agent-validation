@@ -1,0 +1,45 @@
+parameters:
+- name: poolName
+  displayName: "Self Hosted Agent Pool Name"
+  type: string
+
+jobs:
+- job: "agent_discovery"
+  displayName: "Agent Discovery for pool ${{ parameters.poolName }}"
+  pool:
+    name: ${{ parameters.poolName }}
+  steps:
+    - task: Bash@3
+      name: getAllAgentsInPool
+      displayName: "Get All agents in pool ${{ parameters.poolName }}"
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      inputs:
+        targetType: filePath
+        filePath: scripts/get-all-agents-in-pool.sh
+        arguments:
+          -p ${{ parameters.poolName }}
+        failOnStderr: true
+- job: agent_validation
+  displayName: Agent Validation
+  dependsOn:
+    - "agent_discovery"
+  strategy:
+    matrix: $[ dependencies.agent_discovery.outputs['getAllAgentsInPool.agents'] ]
+  pool:
+    name: ${{ parameters.poolName }}
+    demands:
+    - Agent.Name -equals $(agentName)
+  steps:
+  - task: Bash@3
+    displayName: "List Environment Variables $(agentName) "
+    inputs:
+      targetType: "inline"
+      script: |
+        printenv
+  - task: Bash@3
+    displayName: "Check Linux Agent Configuration $(agentName) "
+    inputs:
+      targetType: filePath
+      filePath: scripts/linux-agent-check.sh
+      failOnStderr: true

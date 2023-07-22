@@ -1,0 +1,5 @@
+variables:
+  - name: devAgentPool
+    value: "specify-dev-linux-pool-name"
+  - name: prodAgentPool
+    value: "specify-prod-linux-pool-name"

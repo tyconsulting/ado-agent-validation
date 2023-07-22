@@ -1,0 +1,23 @@
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+
+variables:
+  - template: ./templates/template-agent-validation-variables.yml
+
+stages:
+  - stage: agent_validation_dev
+    displayName: "Agent Validation Dev"
+    condition: always()
+    jobs:
+    - template: ./templates/template-job-linux-agent-validation.yml
+      parameters:
+        poolName: "${{ variables['devAgentPool'] }}"
+
+  - stage: agent_validation_prod
+    displayName: "Agent Validation Prod"
+    condition: always()
+    jobs:
+    - template: ./templates/template-job-linux-agent-validation.yml
+      parameters:
+        poolName: "${{ variables['prodAgentPool'] }}"
